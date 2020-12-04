@@ -1,32 +1,41 @@
 package ru.ncfu.selentar.environment
 
-import ru.ncfu.selentar.view.EnvironmentUi
+import ru.ncfu.selentar.view.EnvironmentView
 import tornadofx.runLater
 import java.lang.Exception
 import java.lang.IllegalStateException
 import java.util.concurrent.atomic.AtomicInteger
 
-class Environment(val mapUi: EnvironmentUi) {
+/**
+ * Класс, имитирующий окружающую среду и действия автомобиля на ней.
+ * Местность в данной среде разбита на квадраты.
+ * Таким образом для для однозначной идентификации автомобиля достаточно трех параметров:
+ *  координаты x, координаты y, и направления автомобиля, см. [Car].
+ */
+class Environment(private val mapView: EnvironmentView) {
 
     /**
      * Карта дорожного покрытия.
      * y, x
      */
-    val map = Array(12) {Array(13) { MapSurface.WASTELAND } }
+    private val map = Array(12) {Array(13) { MapSurface.WASTELAND } }
 
-    val startPosition = Position(2, 10)
-    val startDirection = Direction.NORTH
-    val finishPosition = Position(8, 1)
+    private val startPosition = Position(2, 10)
+    private val startDirection = Direction.NORTH
+    private val finishPosition = Position(8, 1)
 
-    val car = Car(startPosition, startDirection)
+    private val car = Car(startPosition, startDirection)
     var atomicIteration = AtomicInteger(1)
     var atomicTime = AtomicInteger(0)
     var atomicBestTime = AtomicInteger(-1)
     var turnsCount = AtomicInteger(0)
     var canceled = false
     var finished = false
-    var lost = false
+    private var lost = false
 
+    /**
+     * Сбрасывает окружение, возвращает автомобиль на исходное значение
+     */
     fun reset() {
         car.position = startPosition
         car.direction = startDirection
@@ -38,12 +47,20 @@ class Environment(val mapUi: EnvironmentUi) {
         lost = false
     }
 
+    /**
+     * Отображает текущее местоположение автомобиля на карте
+     */
     fun render() {
         runLater {
-            mapUi.setCarAtPosition(car.position, car.direction)
+            mapView.setCarAtPosition(car.position, car.direction)
         }
     }
 
+    /**
+     * Симулирует действие автомобиля.
+     * @param action действие, которое необходимом соврешить автомобилю
+     * @param test true в случае, если необходимо игнорировать возможные препятствия
+     */
     fun step(action: Action, test: Boolean = false) {
         if (canceled && !test) throw IllegalStateException("Эксперемент уже закончился! ${getObservation()}")
 
@@ -84,6 +101,9 @@ class Environment(val mapUi: EnvironmentUi) {
         setState()
     }
 
+    /**
+     * Возвращает известные автомобилю данные окружающей среды, см. [Observation]
+     */
     fun getObservation() : Observation {
         var forward = MapSurface.WASTELAND
         try {

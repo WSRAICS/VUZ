@@ -14,9 +14,13 @@ import ru.ncfu.selentar.environment.Environment
 import tornadofx.*
 import java.lang.IllegalStateException
 
+
+/**
+ * Главное окно программы
+ */
 class MainView : View("Worldskills_2020") {
 
-    private val environmentUi = find<EnvironmentUi>()
+    private val environmentUi = find<EnvironmentView>()
     private val env = Environment(environmentUi)
     private val learner = Learner()
 
@@ -39,10 +43,13 @@ class MainView : View("Worldskills_2020") {
     private val timeProperty = SimpleIntegerProperty(0)
     private val bestTimeProperty = SimpleIntegerProperty(0)
 
-    private var startTask: Task<*> = FXTask() {}
-    private var testTask: Task<*> = FXTask() {}
-    private var learnTask: Task<*> = FXTask() {}
+    private var startTask: Task<*> = FXTask {}
+    private var testTask: Task<*> = FXTask {}
+    private var learnTask: Task<*> = FXTask {}
 
+    /**
+     * Корневой графический элемент
+     */
     override val root = borderpane {
         left {
             vbox {
@@ -332,6 +339,9 @@ class MainView : View("Worldskills_2020") {
         }
     }
 
+    /**
+     * Сброс положения автомобиля
+     */
     private fun reset() {
         env.reset()
         env.render()
@@ -342,6 +352,9 @@ class MainView : View("Worldskills_2020") {
         }
     }
 
+    /**
+     * Выполняет движение автомобиля в отдельном потоке
+     */
     private fun doMove(action: Action, test: Boolean = false) {
         val task = task {
             while (pauseProperty.value) {

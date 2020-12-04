@@ -1,14 +1,18 @@
 package ru.ncfu.selentar
 
+import org.hibernate.SessionFactory
 import org.hibernate.cfg.Configuration
 import org.hibernate.cfg.Environment
 import ru.ncfu.selentar.domain.LearningRecord
 import ru.ncfu.selentar.domain.Record
 import java.util.*
 
+/**
+ * Настройка подключения к базе данных H2
+ */
 object DatabaseConfiguration {
 
-    val SESSION_FACTORY by lazy {
+    val SESSION_FACTORY: SessionFactory by lazy {
         val configuration = Configuration()
 
         val prop = Properties()
