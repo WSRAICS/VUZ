@@ -14,7 +14,6 @@ class EnvironmentUi : View("EnvironmentUi") {
     private val carHeight = 30.0
     private val carWidth = 16.0
     private val carImg = imageview("/img/Wcar.png") {
-        //fitWidth = carWidth
         fitHeight = carHeight
         preserveRatioProperty().value = true
     }

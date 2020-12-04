@@ -36,6 +36,9 @@ dependencies {
 
     testCompile "org.junit.jupiter:junit-jupiter-api:$junit_version"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$junit_version"
+
+    compile 'org.hibernate:hibernate-core:5.4.25.Final'
+    compile 'com.h2database:h2:1.4.197'
 }
 
 mainClassName = "ru.ncfu.selentar.app.MyApp"

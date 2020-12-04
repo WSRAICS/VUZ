@@ -4,6 +4,7 @@ import ru.ncfu.selentar.view.EnvironmentUi
 import tornadofx.runLater
 import java.lang.Exception
 import java.lang.IllegalStateException
+import java.util.concurrent.atomic.AtomicInteger
 
 class Environment(val mapUi: EnvironmentUi) {
 
@@ -18,7 +19,10 @@ class Environment(val mapUi: EnvironmentUi) {
     val finishPosition = Position(8, 1)
 
     val car = Car(startPosition, startDirection)
-    var time = 0
+    var atomicIteration = AtomicInteger(1)
+    var atomicTime = AtomicInteger(0)
+    var atomicBestTime = AtomicInteger(-1)
+    var turnsCount = AtomicInteger(0)
     var canceled = false
     var finished = false
     var lost = false
@@ -26,7 +30,9 @@ class Environment(val mapUi: EnvironmentUi) {
     fun reset() {
         car.position = startPosition
         car.direction = startDirection
-        time = 0
+        atomicTime.set(0)
+        atomicIteration.addAndGet(1)
+        turnsCount.set(0)
         canceled = false
         finished = false
         lost = false
@@ -71,7 +77,10 @@ class Environment(val mapUi: EnvironmentUi) {
             }
         }
 
-        time++
+        atomicTime.addAndGet(1)
+        if (action != Action.MOVE_FORWARD) {
+            turnsCount.addAndGet(1)
+        }
         setState()
     }
 
@@ -95,7 +104,9 @@ class Environment(val mapUi: EnvironmentUi) {
             canceled = canceled,
             finished = finished,
             lost = lost,
-            time = time
+            time = atomicTime.get(),
+            iteration = atomicIteration.get(),
+            turnsCount = turnsCount.get()
         )
     }
 
@@ -103,6 +114,9 @@ class Environment(val mapUi: EnvironmentUi) {
         if (car.position == finishPosition) {
             canceled = true
             finished = true
+            if (atomicTime.get() < atomicBestTime.get() || atomicBestTime.get() == -1) {
+                atomicBestTime.set(atomicTime.get())
+            }
         } else if (map[car.position.y][car.position.x] != MapSurface.ROAD) {
             canceled = true
             lost = true
